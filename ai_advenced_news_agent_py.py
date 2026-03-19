@@ -16,7 +16,6 @@ import os
 from langchain_core.messages import HumanMessage
 import streamlit as st   
 
-
 @tool
 def ai_news_tool(limit: int = 5) -> str:
     """
@@ -70,8 +69,6 @@ def github_search_tool(query: str, limit: int = 5) -> str:
     result = [f"{repo['full_name']} - {repo['html_url']}" for repo in items]
     return "\n".join(result)
 
-from langchain.agents import create_agent
-from langchain_openai import ChatOpenAI
 
 model = ChatOpenAI(
     model_name="gpt-4o-mini",
@@ -89,8 +86,7 @@ agent = create_agent(
 
 )
 
-import streamlit as st
-from langchain.schema import HumanMessage
+
 
 st.header("AI News and GitHub Search")
 
