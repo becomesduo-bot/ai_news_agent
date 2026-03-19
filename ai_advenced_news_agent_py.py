@@ -126,14 +126,10 @@ if st.button("Send Message") or st.sidebar.button("Search"):
     if message_content.strip() != "":
         result = agent.invoke({"messages": [HumanMessage(content=message_content)]})
         response_text = result['messages'][-1].content
-
+        st.write(response)
+        st.markdown("ans {response} ")
         
         
 
 
 
-for sender, msg in active_history:
-    if sender == "You":
-        st.markdown(f"**You:** {msg}")
-    else:
-        st.markdown(f"**Agent:** {msg}")
