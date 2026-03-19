@@ -87,15 +87,7 @@ agent = create_agent(
 )
 
 st.header("AI News App")
-
-
-
-
-
-
-
 st.subheader("🔎 Tool Result:")
-st.write(result['messages'][-1].content)
 
 
 
