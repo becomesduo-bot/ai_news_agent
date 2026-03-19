@@ -104,11 +104,17 @@ if "conversations" not in st.session_state:
 session_keys = list(st.session_state.conversations.keys())
 selected_session = st.sidebar.selectbox("Select chat session:", ["New Session"] + session_keys)
 
+
+MAX_SESSIONS = 5
 if selected_session == "New Session":
     if st.sidebar.button("Start New Session"):
-        new_id = str(uuid.uuid4())[:8]
-        st.session_state.conversations[new_id] = []
-        selected_session = new_id
+        if len(st.session_state.conversations) >= MAX_SESSIONS:
+            st.sidebar.warning(f"Maximum {MAX_SESSIONS} sessions reached. Please use existing sessions.")
+            selected_session = None
+        else:
+            new_id = str(uuid.uuid4())[:8]
+            st.session_state.conversations[new_id] = []
+            selected_session = new_id
 
 
 st.header("AI News & GitHub Multi-Session Chat App")
@@ -118,26 +124,29 @@ user_message = st.text_area("Your message:", "")
 
 
 if st.button("Send Message") or st.sidebar.button("Search"):
-    if st.session_state.conversations.get(selected_session) is None:
-        st.session_state.conversations[selected_session] = []
-
-    
-    if tool_query and st.sidebar.button("Search"):
-        if tool_option == "AI News":
-            message_content = f"{tool_query} | tool:ai_news | limit:{num_results}"
-        else:
-            message_content = f"{tool_query} | tool:github_search | limit:{num_results}"
+    if selected_session is None:
+        st.warning("Please select or start a session first.")
     else:
-        message_content = user_message
-
-   
-    if message_content.strip() != "":
-        result = agent.invoke({"messages": [HumanMessage(content=message_content)]})
-        response_text = result['messages'][-1].content
+        if st.session_state.conversations.get(selected_session) is None:
+            st.session_state.conversations[selected_session] = []
 
         
-        st.session_state.conversations[selected_session].append(("You", message_content))
-        st.session_state.conversations[selected_session].append(("Agent", response_text))
+        if tool_query and st.sidebar.button("Search"):
+            if tool_option == "AI News":
+                message_content = f"{tool_query} | tool:ai_news | limit:{num_results}"
+            else:
+                message_content = f"{tool_query} | tool:github_search | limit:{num_results}"
+        else:
+            message_content = user_message
+
+        
+        if message_content.strip() != "":
+            result = agent.invoke({"messages": [HumanMessage(content=message_content)]})
+            response_text = result['messages'][-1].content
+
+           
+            st.session_state.conversations[selected_session].append(("You", message_content))
+            st.session_state.conversations[selected_session].append(("Agent", response_text))
 
 
 if selected_session and st.session_state.conversations.get(selected_session):
