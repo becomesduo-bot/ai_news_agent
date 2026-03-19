@@ -102,7 +102,6 @@ else:
 
 
 st.sidebar.subheader("Select Chat Box")
-st.session_state.active_box = st.sidebar.selectbox("Active chat box:", list(range(MAX_SESSIONS)), format_func=lambda x: box_options[x])
 
 
 st.header("AI News  App")
@@ -112,8 +111,8 @@ user_message = st.text_area("Your message:", "")
 
 
 if st.button("Send Message") or st.sidebar.button("Search"):
-    active = st.session_state.active_box
-    chat_history = st.session_state.chat_boxes[active]
+    
+    
 
    
     if tool_query and st.sidebar.button("Search"):
