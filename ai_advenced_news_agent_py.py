@@ -97,62 +97,50 @@ else:
     tool_query = st.sidebar.text_input("Optional keyword for AI News:")
 
 
-if "conversations" not in st.session_state:
-    st.session_state.conversations = {}
-
-
-session_keys = list(st.session_state.conversations.keys())
-selected_session = st.sidebar.selectbox("Select chat session:", ["New Session"] + session_keys)
-
-
 MAX_SESSIONS = 5
-if selected_session == "New Session":
-    if st.sidebar.button("Start New Session"):
-        if len(st.session_state.conversations) >= MAX_SESSIONS:
-            st.sidebar.warning(f"Maximum {MAX_SESSIONS} sessions reached. Please use existing sessions.")
-            selected_session = None
-        else:
-            new_id = str(uuid.uuid4())[:8]
-            st.session_state.conversations[new_id] = []
-            selected_session = new_id
+if "chat_boxes" not in st.session_state:
+    st.session_state.chat_boxes = [[] for _ in range(MAX_SESSIONS)] 
+    st.session_state.active_box = 0  
 
 
-st.header("AI News & GitHub Multi-Session Chat App")
+box_options = [f"Chat Box {i+1}" for i in range(MAX_SESSIONS)]
+st.sidebar.subheader("Select Chat Box")
+st.session_state.active_box = st.sidebar.selectbox("Active chat box:", list(range(MAX_SESSIONS)), format_func=lambda x: box_options[x])
+
+
+st.header("AI News & GitHub Multi-Box Chat App")
 
 
 user_message = st.text_area("Your message:", "")
 
 
 if st.button("Send Message") or st.sidebar.button("Search"):
-    if selected_session is None:
-        st.warning("Please select or start a session first.")
+    active = st.session_state.active_box
+    chat_history = st.session_state.chat_boxes[active]
+
+   
+    if tool_query and st.sidebar.button("Search"):
+        if tool_option == "AI News":
+            message_content = f"{tool_query} | tool:ai_news | limit:{num_results}"
+        else:
+            message_content = f"{tool_query} | tool:github_search | limit:{num_results}"
     else:
-        if st.session_state.conversations.get(selected_session) is None:
-            st.session_state.conversations[selected_session] = []
+        message_content = user_message
+
+    if message_content.strip() != "":
+        result = agent.invoke({"messages": [HumanMessage(content=message_content)]})
+        response_text = result['messages'][-1].content
 
         
-        if tool_query and st.sidebar.button("Search"):
-            if tool_option == "AI News":
-                message_content = f"{tool_query} | tool:ai_news | limit:{num_results}"
-            else:
-                message_content = f"{tool_query} | tool:github_search | limit:{num_results}"
-        else:
-            message_content = user_message
-
-        
-        if message_content.strip() != "":
-            result = agent.invoke({"messages": [HumanMessage(content=message_content)]})
-            response_text = result['messages'][-1].content
-
-           
-            st.session_state.conversations[selected_session].append(("You", message_content))
-            st.session_state.conversations[selected_session].append(("Agent", response_text))
+        chat_history.append(("You", message_content))
+        chat_history.append(("Agent", response_text))
+        st.session_state.chat_boxes[active] = chat_history
 
 
-if selected_session and st.session_state.conversations.get(selected_session):
-    st.subheader(f"Chat Session: {selected_session}")
-    for sender, msg in st.session_state.conversations[selected_session]:
-        if sender == "You":
-            st.markdown(f"**You:** {msg}")
-        else:
-            st.markdown(f"**Agent:** {msg}")
+active_history = st.session_state.chat_boxes[st.session_state.active_box]
+st.subheader(f"Chat Box {st.session_state.active_box + 1}")
+for sender, msg in active_history:
+    if sender == "You":
+        st.markdown(f"**You:** {msg}")
+    else:
+        st.markdown(f"**Agent:** {msg}")
