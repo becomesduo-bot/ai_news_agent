@@ -118,5 +118,5 @@ if st.sidebar.button("Search"):
     result = agent.invoke({
         "messages": [HumanMessage(content=message_content)]
     })
-st.subheader("Response:")
-st.write(result['messages'][-1].content)
+    st.subheader("Response:")
+    st.write(result['messages'][-1].content)
