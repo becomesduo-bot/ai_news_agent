@@ -93,8 +93,11 @@ num_results = st.sidebar.number_input("Number of results (1-10):", 1, 10, 5)
 
 if tool_option == "GitHub Search":
     tool_query = st.sidebar.text_input("Enter GitHub query:")
+    st.write(tool_query)
 else:
     tool_query = st.sidebar.text_input("Optional keyword for AI News:")
+    ans=st.write(tool_query)
+    return st.markdown("top search {ans} ")
 
 
 
@@ -108,6 +111,10 @@ st.header("AI News  App")
 
 
 user_message = st.text_area("Your message:", "")
+result = agent.invoke({"messages": [HumanMessage(content=user_messeage)]})
+response_text = result['messages'][-1].content
+st.write (response)
+
 
 
 if st.button("Send Message") or st.sidebar.button("Search"):
