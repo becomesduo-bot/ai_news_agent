@@ -89,39 +89,13 @@ agent = create_agent(
 st.header("AI News App")
 
 
-st.sidebar.header("Select Tool & Options")
-
-tool_option = st.sidebar.selectbox(
-    "Select a tool:",
-    ("AI News", "GitHub Search")
-)
-
-num_results = st.sidebar.number_input(
-    "Number of results (1-10):",
-    min_value=1,
-    max_value=10,
-    value=5
-)
 
 
-if tool_option == "GitHub Search":
-    tool_query = st.sidebar.text_input("Enter GitHub query:")
-else:
-    tool_query = st.sidebar.text_input("Optional keyword for AI News:")
 
 
-if st.sidebar.button("Search"):
-    if tool_option == "AI News":
-        message_content = f"{tool_query} | tool:ai_news | limit:{num_results}"
-    else:
-        message_content = f"{tool_query} | tool:github_search | limit:{num_results}"
 
-    result = agent.invoke({
-        "messages": [HumanMessage(content=message_content)]
-    })
-
-    st.subheader("🔎 Tool Result:")
-    st.write(result['messages'][-1].content)
+st.subheader("🔎 Tool Result:")
+st.write(result['messages'][-1].content)
 
 
 
