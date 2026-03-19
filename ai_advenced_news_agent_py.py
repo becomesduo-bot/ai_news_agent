@@ -14,7 +14,7 @@ from langchain.agents import create_agent
 from langchain_openai import ChatOpenAI
 import os
 from langchain_core.messages import HumanMessage
-import straemlit as st
+import streamlit as st   
 
 
 @tool
