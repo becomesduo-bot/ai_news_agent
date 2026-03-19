@@ -96,7 +96,7 @@ tool_option = st.sidebar.selectbox(
 )
 
 num_results = st.sidebar.number_input(
-    "Number of results (1-10):",
+    "Number of results (1-10):repo ",
     min_value=1,
     max_value=10,
     value=5,
@@ -118,6 +118,5 @@ if st.sidebar.button("Search"):
     result = agent.invoke({
         "messages": [HumanMessage(content=message_content)]
     })
-
-    st.subheader("Agent Response:")
-    st.write(result['messages'][-1].content)
+st.subheader("Response:")
+st.write(result['messages'][-1].content)
