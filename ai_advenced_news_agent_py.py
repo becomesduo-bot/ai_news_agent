@@ -128,13 +128,10 @@ if st.button("Send Message") or st.sidebar.button("Search"):
         response_text = result['messages'][-1].content
 
         
-        chat_history.append(("You", message_content))
-        chat_history.append(("Agent", response_text))
-        st.session_state.chat_boxes[active] = chat_history
+        
 
 
-active_history = st.session_state.chat_boxes[st.session_state.active_box]
-st.subheader(f"Chat Box {st.session_state.active_box + 1}")
+
 for sender, msg in active_history:
     if sender == "You":
         st.markdown(f"**You:** {msg}")
