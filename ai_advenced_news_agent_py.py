@@ -86,57 +86,57 @@ agent = create_agent(
 
 )
 
+st.header("AI News App")
+
 
 st.sidebar.header("Select Tool & Options")
-tool_option = st.sidebar.selectbox("Select a tool:", ("AI News", "GitHub Search"))
-num_results = st.sidebar.number_input("Number of results (1-10):", 1, 10, 5)
+
+tool_option = st.sidebar.selectbox(
+    "Select a tool:",
+    ("AI News", "GitHub Search")
+)
+
+num_results = st.sidebar.number_input(
+    "Number of results (1-10):",
+    min_value=1,
+    max_value=10,
+    value=5
+)
+
 
 if tool_option == "GitHub Search":
     tool_query = st.sidebar.text_input("Enter GitHub query:")
-    st.write(tool_query)
 else:
     tool_query = st.sidebar.text_input("Optional keyword for AI News:")
-    ans=st.write(tool_query)
-    return st.markdown("top search {ans} ")
 
 
-
-
-
-
-st.sidebar.subheader("Select Chat Box")
-
-
-st.header("AI News  App")
-
-
-user_message = st.text_area("Your message:", "")
-result = agent.invoke({"messages": [HumanMessage(content=user_messeage)]})
-response_text = result['messages'][-1].content
-st.write (response)
-
-
-
-if st.button("Send Message") or st.sidebar.button("Search"):
-    
-    
-
-   
-    if tool_query and st.sidebar.button("Search"):
-        if tool_option == "AI News":
-            message_content = f"{tool_query} | tool:ai_news | limit:{num_results}"
-        else:
-            message_content = f"{tool_query} | tool:github_search | limit:{num_results}"
+if st.sidebar.button("Search"):
+    if tool_option == "AI News":
+        message_content = f"{tool_query} | tool:ai_news | limit:{num_results}"
     else:
-        message_content = user_message
+        message_content = f"{tool_query} | tool:github_search | limit:{num_results}"
 
-    if message_content.strip() != "":
-        result = agent.invoke({"messages": [HumanMessage(content=message_content)]})
+    result = agent.invoke({
+        "messages": [HumanMessage(content=message_content)]
+    })
+
+    st.subheader("🔎 Tool Result:")
+    st.write(result['messages'][-1].content)
+
+
+
+
+st.subheader("💬 Chat with Agent")
+
+user_message = st.text_area("Your message:")
+
+if st.button("Send Message"):
+    if user_message.strip() != "":
+        result = agent.invoke({
+            "messages": [HumanMessage(content=user_message)]
+        })
+
         response_text = result['messages'][-1].content
-        st.write(response)
-        st.markdown("ans {response} ")
-        
-        
 
-
-
+        st.subheader("🤖 Agent Response:")
+        st.write(response_text)
