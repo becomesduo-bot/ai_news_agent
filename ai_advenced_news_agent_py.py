@@ -97,18 +97,15 @@ else:
     tool_query = st.sidebar.text_input("Optional keyword for AI News:")
 
 
-MAX_SESSIONS = 5
-if "chat_boxes" not in st.session_state:
-    st.session_state.chat_boxes = [[] for _ in range(MAX_SESSIONS)] 
-    st.session_state.active_box = 0  
 
 
-box_options = [f"Chat Box {i+1}" for i in range(MAX_SESSIONS)]
+
+
 st.sidebar.subheader("Select Chat Box")
 st.session_state.active_box = st.sidebar.selectbox("Active chat box:", list(range(MAX_SESSIONS)), format_func=lambda x: box_options[x])
 
 
-st.header("AI News & GitHub Multi-Box Chat App")
+st.header("AI News  App")
 
 
 user_message = st.text_area("Your message:", "")
