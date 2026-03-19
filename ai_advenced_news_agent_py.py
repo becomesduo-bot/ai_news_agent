@@ -87,36 +87,47 @@ agent = create_agent(
 )
 
 
-st.header("AI news app")
-st.sidebar.header("Select the  Options")
-
-tool_option = st.sidebar.selectbox(
-    "Select a tool:",
-    ("AI News", "GitHub Search")
-)
-
-num_results = st.sidebar.number_input(
-    "Number of results (1-10):repo ",
-    min_value=1,
-    max_value=10,
-    value=5,
-    step=1
-)
-
+st.sidebar.header("Select Tool & Options")
+tool_option = st.sidebar.selectbox("Select a tool:", ("AI News", "GitHub Search"))
+num_results = st.sidebar.number_input("Number of results (1-10):", 1, 10, 5)
 
 if tool_option == "GitHub Search":
-    user_query = st.sidebar.text_input("Enter GitHub query:")
+    tool_query = st.sidebar.text_input("Enter GitHub query:")
 else:
-    user_query = st.sidebar.text_input("Optional keyword for AI News:")
+    tool_query = st.sidebar.text_input("Optional keyword for AI News:")
 
-if st.sidebar.button("Search"):
-    if tool_option == "AI News":
-        message_content = f"{user_query} | tool:ai_news | limit:{num_results}"
+
+if "chat_history" not in st.session_state:
+    st.session_state.chat_history = []
+
+
+st.header("AI News & GitHub Chat App")
+
+
+user_message = st.text_area("Chat with the Agent:", "")
+
+if st.button("Send Message") or st.sidebar.button("Search"):
+    
+    if st.sidebar.button("Search") and tool_query:
+        if tool_option == "AI News":
+            message_content = f"{tool_query} | tool:ai_news | limit:{num_results}"
+        else:
+            message_content = f"{tool_query} | tool:github_search | limit:{num_results}"
     else:
-        message_content = f"{user_query} | tool:github_search | limit:{num_results}"
+        message_content = user_message
 
-    result = agent.invoke({
-        "messages": [HumanMessage(content=message_content)]
-    })
-    st.subheader("Response:")
-    st.write(result['messages'][-1].content)
+   
+    if message_content.strip() != "":
+        result = agent.invoke({"messages": [HumanMessage(content=message_content)]})
+        response_text = result['messages'][-1].content
+
+        
+        st.session_state.chat_history.append(("User", message_content))
+        st.session_state.chat_history.append(("Agent", response_text))
+
+
+for sender, msg in st.session_state.chat_history:
+    if sender == "User":
+        st.markdown(f"**You:** {msg}")
+    else:
+        st.markdown(f"**Agent:** {msg}")
