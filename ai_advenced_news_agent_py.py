@@ -97,18 +97,32 @@ else:
     tool_query = st.sidebar.text_input("Optional keyword for AI News:")
 
 
-if "chat_history" not in st.session_state:
-    st.session_state.chat_history = []
+if "conversations" not in st.session_state:
+    st.session_state.conversations = {}
 
 
-st.header("AI News & GitHub Chat App")
+session_keys = list(st.session_state.conversations.keys())
+selected_session = st.sidebar.selectbox("Select chat session:", ["New Session"] + session_keys)
+
+if selected_session == "New Session":
+    if st.sidebar.button("Start New Session"):
+        new_id = str(uuid.uuid4())[:8]
+        st.session_state.conversations[new_id] = []
+        selected_session = new_id
 
 
-user_message = st.text_area("Chat with the Agent:", "")
+st.header("AI News & GitHub Multi-Session Chat App")
+
+
+user_message = st.text_area("Your message:", "")
+
 
 if st.button("Send Message") or st.sidebar.button("Search"):
+    if st.session_state.conversations.get(selected_session) is None:
+        st.session_state.conversations[selected_session] = []
+
     
-    if st.sidebar.button("Search") and tool_query:
+    if tool_query and st.sidebar.button("Search"):
         if tool_option == "AI News":
             message_content = f"{tool_query} | tool:ai_news | limit:{num_results}"
         else:
@@ -122,12 +136,14 @@ if st.button("Send Message") or st.sidebar.button("Search"):
         response_text = result['messages'][-1].content
 
         
-        st.session_state.chat_history.append(("User", message_content))
-        st.session_state.chat_history.append(("Agent", response_text))
+        st.session_state.conversations[selected_session].append(("You", message_content))
+        st.session_state.conversations[selected_session].append(("Agent", response_text))
 
 
-for sender, msg in st.session_state.chat_history:
-    if sender == "User":
-        st.markdown(f"**You:** {msg}")
-    else:
-        st.markdown(f"**Agent:** {msg}")
+if selected_session and st.session_state.conversations.get(selected_session):
+    st.subheader(f"Chat Session: {selected_session}")
+    for sender, msg in st.session_state.conversations[selected_session]:
+        if sender == "You":
+            st.markdown(f"**You:** {msg}")
+        else:
+            st.markdown(f"**Agent:** {msg}")
