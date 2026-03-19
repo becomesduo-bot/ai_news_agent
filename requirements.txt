@@ -1,0 +1,17 @@
+# Streamlit for UI
+streamlit>=1.30.0
+
+# LangChain for agents and tools
+langchain>=1.0.0
+
+# LangChain OpenAI integration
+langchain-openai>=0.0.12
+
+# OpenAI Python client
+openai>=1.31.0
+
+# Requests for HTTP calls
+requests>=2.31.0
+
+# Feedparser for RSS feed parsing
+feedparser>=6.0.10
