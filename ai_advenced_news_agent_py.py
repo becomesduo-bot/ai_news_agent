@@ -97,7 +97,6 @@ tool_option = st.selectbox(
 )
 
 
-user_query = st.text_input("Enter your query:")
 
 
 num_results = st.number_input(
@@ -115,15 +114,27 @@ if st.button("Search"):
     if tool_option == "AI News":
 
         message_content = f"{user_query} | tool:ai_news | limit:{num_results}"
+        user_query = st.text_input("Enter your query:")
+        result = agent.invoke({
+        "messages": [HumanMessage(content=user_query)]
+        })
+        st.subheader(" Response:")
+        st.write(result['messages'][-1].content)
+
     else:
 
         message_content = f"{user_query} | tool:github_search | limit:{num_results}"
-
-
-    result = agent.invoke({
+        result = agent.invoke({
         "messages": [HumanMessage(content=message_content)]
-    })
+        })
+        st.subheader(" Response:")
+        st.write(result['messages'][-1].content)
 
 
-    st.subheader("Agent Response:")
-    st.write(result['messages'][-1].content)
+    #result = agent.invoke({
+     #   "messages": [HumanMessage(content=message_content)]
+    #})
+
+
+    #st.subheader("Agent Response:")
+    #st.write(result['messages'][-1].content)
