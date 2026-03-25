@@ -79,8 +79,7 @@ if openai_api_key:
         temperature=0.7,
         openai_api_key=openai_api_key
     )
-else:
-    st.warning("Please provide your OpenAI API key in the sidebar.")
+
 
 
 
