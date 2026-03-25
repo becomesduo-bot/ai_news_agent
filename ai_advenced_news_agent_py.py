@@ -29,7 +29,8 @@ if not enter:
 github_token = st.text_input("Enter your GitHub Token", type="password")
 openai_api_key=st.text_input("Enter your  api key", type="password")
 
-
+model = None
+agent = None
     
 
 @tool
