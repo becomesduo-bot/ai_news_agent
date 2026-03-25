@@ -16,16 +16,26 @@ import os
 from langchain_core.messages import HumanMessage
 import streamlit as st   
 
+
+
+from langchain.tools import tool
+import requests
+import feedparser
+from langchain.agents import create_agent
+from langchain_openai import ChatOpenAI
+from langchain_core.messages import HumanMessage
+import streamlit as st
+
+
+st.sidebar.header("API Keys")
+github_token = st.sidebar.text_input("Enter your GitHub Token", type="password")
+openai_api_key = st.sidebar.text_input("Enter your OpenAI API Key", type="password")
+
+
 @tool
 def ai_news_tool(limit: int = 5) -> str:
     """
     Fetches the latest AI news from artificialintelligence-news.com RSS feed.
-
-    Args:
-        limit: Number of latest news items to return
-
-    Returns:
-        A string containing the latest AI news titles and links.
     """
     url = "https://www.artificialintelligence-news.com/feed/"
     headers = {"User-Agent": "Mozilla/5.0"}
@@ -39,21 +49,15 @@ def ai_news_tool(limit: int = 5) -> str:
     return "\n".join(news_set) if news_set else "No AI news found."
 
 
-
 @tool
 def github_search_tool(query: str, limit: int = 5) -> str:
     """
-    Searches GitHub repositories for a given query and returns the top results.
-
-    Args:
-        query: The search term to look for in GitHub repositories.
-        limit: Maximum number of top repositories to return (default is 5).
-
-    Returns:
-        A string containing the repository full names and URLs, separated by new lines.
+    Searches GitHub repositories using user-provided token.
     """
-    GITHUB_TOKEN = st.secrets["GITHUB_TOKEN"]
-    headers = {"Authorization": f"token {GITHUB_TOKEN}"}
+    if not github_token:
+        return "Please provide your GitHub token in the sidebar."
+    
+    headers = {"Authorization": f"token {github_token}"}
     url = "https://api.github.com/search/repositories"
     params = {"q": query, "sort": "stars", "order": "desc", "per_page": limit}
 
@@ -66,34 +70,30 @@ def github_search_tool(query: str, limit: int = 5) -> str:
     if not items:
         return "No repositories found."
 
-    result = [f"{repo['full_name']} - {repo['html_url']}" for repo in items]
-    return "\n".join(result)
+    return "\n".join([f"{repo['full_name']} - {repo['html_url']}" for repo in items])
 
 
-model = ChatOpenAI(
-    model_name="gpt-4o-mini",
-    temperature=0.7,
-    openai_api_key=st.secrets["OPENAI_API_KEY"]
-)
-
+if openai_api_key:
+    model = ChatOpenAI(
+        model_name="gpt-4o-mini",
+        temperature=0.7,
+        openai_api_key=openai_api_key
+    )
+else:
+    st.warning("Please provide your OpenAI API key to chat with the agent.")
 
 tools = [ai_news_tool, github_search_tool]
-
 
 agent = create_agent(
     tools=tools,
     model=model,
-
 )
+
 
 st.header("AI News App")
 st.subheader("🔎 Tool Result:")
 
-
-
-
 st.subheader("💬 Chat with Agent")
-
 user_message = st.text_area("Your message:")
 
 if st.button("Send Message"):
@@ -101,8 +101,6 @@ if st.button("Send Message"):
         result = agent.invoke({
             "messages": [HumanMessage(content=user_message)]
         })
-
         response_text = result['messages'][-1].content
-
         st.subheader("🤖 Agent Response:")
         st.write(response_text)
