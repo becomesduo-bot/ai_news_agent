@@ -20,7 +20,7 @@ import streamlit as st
 
 
 
-st.sidebar.header("API Keys")
+st.header("first you enter API Key and github token")
 github_token = st.text_input("Enter your GitHub Token", type="password")
 openai_api_key = st.text_input("Enter your OpenAI API Key", type="password")
 
