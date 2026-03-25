@@ -73,13 +73,22 @@ def github_search_tool(query: str, limit: int = 5) -> str:
 
     return "\n".join([f"{repo['full_name']} - {repo['html_url']}" for repo in items])
 
-if openai_api_key: 
-    model = ChatOpenAI(
-        model_name="gpt-4o-mini",
-        temperature=0.7,
-        openai_api_key=openai_api_key
-    )
-
+model = None
+if openai_api_key.strip():
+    from langchain_openai import ChatOpenAI
+    try:
+        model = ChatOpenAI(
+            model_name="gpt-4o-mini",
+            temperature=0.7,
+            openai_api_key=openai_api_key
+        )
+        
+        _ = model.invoke([HumanMessage(content="Hello")])
+    except Exception as e:
+        st.error("⚠️ Invalid OpenAI API Key! Please check your key.")
+        model = None
+else:
+    st.warning("OpenAI API key missing!")
 
 
 
@@ -89,20 +98,24 @@ tools = [ai_news_tool, github_search_tool]
 if model:  
     agent = create_agent(tools=tools, model=model)
 
+
+
+
 user_message = st.text_area("Your message:")
 
 if st.button("Send Message"):
-    if not openai_api_key:
-        st.warning("Please enter your OpenAI API key in the sidebar to chat with the agent.")
-    elif not github_token:
-        st.warning("Please enter your GitHub token in the sidebar to use GitHub search tool.")
-    elif user_message.strip() == "":
-        st.warning("Please type a message to send to the agent.")
+    if not openai_api_key.strip():
+        st.warning("Cannot chat: OpenAI API key missing.")
+    elif not github_token.strip():
+        st.warning("Cannot search GitHub: token missing.")
+    elif not user_message.strip():
+        st.warning("Please type a message.")
+    elif not model:
+        st.warning("Agent not initialized. Your OpenAI key may be invalid.")
     else:
-        
-        result = agent.invoke({
-            "messages": [HumanMessage(content=user_message)]
-        })
-        response_text = result['messages'][-1].content
-        st.subheader("🤖 Agent Response:")
-        st.write(response_text)
+        try:
+            result = agent.invoke({"messages": [HumanMessage(content=user_message)]})
+            st.subheader("🤖 Agent Response:")
+            st.write(result['messages'][-1].content)
+        except Exception as e:
+            st.error(f"⚠️ Something went wrong: {e}")
