@@ -72,16 +72,13 @@ def github_search_tool(query: str, limit: int = 5) -> str:
 
     return "\n".join([f"{repo['full_name']} - {repo['html_url']}" for repo in items])
 
-model = None  
 
-if openai_api_key:
     model = ChatOpenAI(
         model_name="gpt-4o-mini",
         temperature=0.7,
         openai_api_key=openai_api_key
     )
-else:
-    st.warning("Please provide your OpenAI API key to chat with the agent.")
+
 
 
 
