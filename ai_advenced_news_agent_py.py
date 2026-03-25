@@ -17,7 +17,10 @@ from langchain_core.messages import HumanMessage
 import streamlit as st   
 
 
+st.header("AI News App")
+st.subheader("🔎 Tool Result:")
 
+st.subheader("💬 Chat with Agent")
 
 
 enter=st.header("first you enter API Key and github token")
@@ -85,10 +88,7 @@ agent = create_agent(
 )
 
 
-st.header("AI News App")
-st.subheader("🔎 Tool Result:")
 
-st.subheader("💬 Chat with Agent")
 user_message = st.text_area("Your message:")
 
 if st.button("Send Message"):
