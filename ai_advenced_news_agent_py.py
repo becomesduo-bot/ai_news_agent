@@ -29,6 +29,7 @@ if not enter:
 github_token = st.text_input("Enter your GitHub Token", type="password")
 openai_api_key = st.text_input("Enter your OpenAI API Key", type="password")
 
+    
 
 @tool
 def ai_news_tool(limit: int = 5) -> str:
@@ -77,8 +78,7 @@ if openai_api_key:
         temperature=0.7,
         openai_api_key=openai_api_key
     )
-else:
-    st.warning("Please provide your OpenAI API key to chat with the agent.")
+
 
 tools = [ai_news_tool, github_search_tool]
 
