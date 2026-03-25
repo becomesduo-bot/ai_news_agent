@@ -63,17 +63,20 @@ def github_search_tool(query: str, limit: int = 5) -> str:
     params = {"q": query, "sort": "stars", "order": "desc", "per_page": limit}
 
     response = requests.get(url, headers=headers, params=params)
-    if response.status_code != 200:
-        return f"Failed to fetch GitHub repos. Status code: {response.status_code}"
-
+    
+     if response.status_code == 401:  #
+        return "⚠️ Invalid GitHub token! Please check your token."
+    elif response.status_code != 200:
+        return f"GitHub request failed with status {response.status_code}."
+    
     data = response.json()
     items = data.get("items", [])
     if not items:
         return "No repositories found."
-
+    
     return "\n".join([f"{repo['full_name']} - {repo['html_url']}" for repo in items])
+    
 
-model = None
 if openai_api_key.strip():
     from langchain_openai import ChatOpenAI
     try:
