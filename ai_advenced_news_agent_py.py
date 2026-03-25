@@ -18,18 +18,11 @@ import streamlit as st
 
 
 
-from langchain.tools import tool
-import requests
-import feedparser
-from langchain.agents import create_agent
-from langchain_openai import ChatOpenAI
-from langchain_core.messages import HumanMessage
-import streamlit as st
 
 
 st.sidebar.header("API Keys")
-github_token = st.sidebar.text_input("Enter your GitHub Token", type="password")
-openai_api_key = st.sidebar.text_input("Enter your OpenAI API Key", type="password")
+github_token = st.text_input("Enter your GitHub Token", type="password")
+openai_api_key = st.text_input("Enter your OpenAI API Key", type="password")
 
 
 @tool
