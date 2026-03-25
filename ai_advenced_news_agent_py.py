@@ -27,7 +27,7 @@ enter=st.header("first you enter API Key and github token")
 if not enter: 
     st.error("pleaze enter  your keys")
 github_token = st.text_input("Enter your GitHub Token", type="password")
-openai_api_key = st.text_input("Enter your OpenAI API Key", type="password")
+
 
     
 
@@ -71,7 +71,7 @@ def github_search_tool(query: str, limit: int = 5) -> str:
 
     return "\n".join([f"{repo['full_name']} - {repo['html_url']}" for repo in items])
 
-
+openai_api_key = st.text_input("Enter your OpenAI API Key", type="password")
 if openai_api_key:
     model = ChatOpenAI(
         model_name="gpt-4o-mini",
@@ -92,7 +92,14 @@ agent = create_agent(
 user_message = st.text_area("Your message:")
 
 if st.button("Send Message"):
-    if user_message.strip() != "":
+    if not openai_api_key:
+        st.warning("Please enter your OpenAI API key in the sidebar to chat with the agent.")
+    elif not github_token:
+        st.warning("Please enter your GitHub token in the sidebar to use GitHub search tool.")
+    elif user_message.strip() == "":
+        st.warning("Please type a message to send to the agent.")
+    else:
+        #
         result = agent.invoke({
             "messages": [HumanMessage(content=user_message)]
         })
