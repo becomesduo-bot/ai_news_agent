@@ -20,7 +20,9 @@ import streamlit as st
 
 
 
-st.header("first you enter API Key and github token")
+enter=st.header("first you enter API Key and github token")
+if not enter: 
+    st.error("pleaze enter  your keys")
 github_token = st.text_input("Enter your GitHub Token", type="password")
 openai_api_key = st.text_input("Enter your OpenAI API Key", type="password")
 
